@@ -32,7 +32,7 @@ class DecoratorProcessor:
 
     decorators_to_search = ["Requirements", "SVCs"]
 
-    yaml_language_server = "# yaml-language-server: $schema=https://raw.githubusercontent.com/Luftfartsverket/reqstool-client/main/src/reqstool/resources/schemas/v1/annotations.schema.json\n"  # noqa: E501
+    yaml_language_server = "# yaml-language-server: $schema=https://raw.githubusercontent.com/reqstool/reqstool-client/main/src/reqstool/resources/schemas/v1/annotations.schema.json\n"  # noqa: E501
 
     def __init__(self, *args, **kwargs):
         """

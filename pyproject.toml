@@ -10,28 +10,22 @@ testpaths = ["tests/unit"]
 [project]
 name = "reqstool-python-decorators"
 dynamic = ["version"]
-authors = [{ name = "LFV SYSDEV", email = "sysdev@lfv.com" }]
+authors = [{ name = "reqstool" }]
 description = "Reqstool Python Decorators"
 readme = "README.md"
-
-homepage = "https://github.com/Luftfartsverket/reqstool-python-decorators.git"
-repository = "https://github.com/Luftfartsverket/reqstool-python-decorators.git"
-documentation = "hhttps://github.com/Luftfartsverket/reqstool-python-decorators.git"
-
-urls.Source = "https://github.com/Luftfartsverket/reqstool-python-decorators.git"
-
+requires-python = ">=3.10"
 classifiers = [
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
     "Operating System :: OS Independent",
     "Development Status :: 4 - Beta",
 ]
-
-requires-python = ">=3.10"
-
 dependencies = ["ruamel.yaml>=0.18.5"]
 
-packages = [{ include = "reqstool_python_decorators", from = "src" }]
+[project.urls]
+Homepage = "https://reqstool.github.io"
+Source = "https://github.com/reqstool/reqstool-python-decorators.git"
+Documentation = "https://github.com/reqstool/reqstool-python-decorators.git"
 
 [project.scripts]
 # section needed for poetry convertion
