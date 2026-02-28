@@ -1,9 +1,9 @@
 
-[![Commit Activity](https://img.shields.io/github/commit-activity/m/Luftfartsverket/reqstool-python-decorators?label=commits&style=for-the-badge)](https://github.com/Luftfartsverket/reqstool-python-decorators/pulse)
-[![GitHub Issues](https://img.shields.io/github/issues/Luftfartsverket/reqstool-python-decorators?style=for-the-badge&logo=github)](https://github.com/Luftfartsverket/reqstool-python-decorators/issues)
-[![License](https://img.shields.io/github/license/Luftfartsverket/reqstool-python-decorators?style=for-the-badge&logo=opensourceinitiative)](https://opensource.org/license/mit/)
-[![Build](https://img.shields.io/github/actions/workflow/status/Luftfartsverket/reqstool-python-decorators/build.yml?style=for-the-badge&logo=github)](https://github.com/Luftfartsverket/reqstool-python-decorators/actions/workflows/build.yml)
-[![Static Badge](https://img.shields.io/badge/Documentation-blue?style=for-the-badge&link=docs)](https://luftfartsverket.github.io/reqstool-python-decorators/reqstool-python-decorators/0.0.1/index.html)
+[![Commit Activity](https://img.shields.io/github/commit-activity/m/reqstool/reqstool-python-decorators?label=commits&style=for-the-badge)](https://github.com/reqstool/reqstool-python-decorators/pulse)
+[![GitHub Issues](https://img.shields.io/github/issues/reqstool/reqstool-python-decorators?style=for-the-badge&logo=github)](https://github.com/reqstool/reqstool-python-decorators/issues)
+[![License](https://img.shields.io/github/license/reqstool/reqstool-python-decorators?style=for-the-badge&logo=opensourceinitiative)](https://opensource.org/license/mit/)
+[![Build](https://img.shields.io/github/actions/workflow/status/reqstool/reqstool-python-decorators/build.yml?style=for-the-badge&logo=github)](https://github.com/reqstool/reqstool-python-decorators/actions/workflows/build.yml)
+[![Static Badge](https://img.shields.io/badge/Documentation-blue?style=for-the-badge&link=docs)](https://reqstool.github.io/reqstool-python-decorators/reqstool-python-decorators/0.0.1/index.html)
 
 # Reqstool Python Decorators
 
