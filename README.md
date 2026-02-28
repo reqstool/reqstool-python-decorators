@@ -85,4 +85,4 @@ process_decorated_data(path_to_python_files, output_file)
 
 ## License
 
-This project is licensed under the MIT.
+This project is licensed under the MIT License.
