@@ -11,6 +11,10 @@
 
 This provides decorators and collecting of decorated code, formatting it and writing to yaml file.
 
+## Requirements
+
+- Python >= 3.13
+
 ## Installation
 
 The package name is `reqstool-python-decorators`.
@@ -45,7 +49,7 @@ reqstool-python-decorators = "<version>"
 Import decorators:
 
 ```
-from reqstool-decorators.decorators.decorators import Requirements, SVCs
+from reqstool_python_decorators.decorators.decorators import Requirements, SVCs
 ```
 
 Example usage of the decorators:
@@ -65,7 +69,7 @@ def test_somefunction():
 Import processor:
 
 ```
-from reqstool.processors.decorator_processor import DecoratorProcessor
+from reqstool_python_decorators.processors.decorator_processor import DecoratorProcessor
 ```
 
 Main function to collect decorators data and generate yaml file:
@@ -81,4 +85,4 @@ process_decorated_data(path_to_python_files, output_file)
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE.md file for details.
+This project is licensed under the MIT.
