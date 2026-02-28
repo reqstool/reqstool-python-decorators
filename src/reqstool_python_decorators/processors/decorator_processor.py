@@ -100,7 +100,7 @@ class DecoratorProcessor:
                     self.req_svc_results.append(
                         {
                             "fullyQualifiedName": str(file_path).replace("/", "."),
-                            "elementKind": str(type(node)).split(".")[-1][:-5].upper(),
+                            "elementKind": node.__class__.__name__[:-3].upper(),
                             "name": node.name,
                             "decorators": decorators_info,
                         }
@@ -198,6 +198,8 @@ class DecoratorProcessor:
         This method takes a list of directories containing Python files, collects decorated data from these files,
         formats the collected data, and writes the formatted results to YAML file for Requirements and SVCs annotations.
         """
+
+        self.req_svc_results = []
 
         for path in path_to_python_files:
             python_files = self.find_python_files(directory=path)
