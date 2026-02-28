@@ -2,6 +2,7 @@
 
 from enum import Enum, unique
 import os
+from typing import ReadOnly, TypedDict
 from ruamel.yaml import YAML
 import ast
 
@@ -17,6 +18,21 @@ class DECORATOR_TYPES(Enum):
 
     def get_from_to(self):
         return f"from: {self.from_value}, to: {self.to_value}"
+
+
+class DecoratorInfo(TypedDict):
+    name: ReadOnly[str]
+    args: ReadOnly[list[str]]
+
+
+class ElementResult(TypedDict):
+    fullyQualifiedName: ReadOnly[str]
+    elementKind: ReadOnly[str]
+    name: ReadOnly[str]
+    decorators: ReadOnly[list[DecoratorInfo]]
+
+
+type Results = list[ElementResult]
 
 
 class DecoratorProcessor:
@@ -47,9 +63,9 @@ class DecoratorProcessor:
 
         """
         super().__init__(*args, **kwargs)
-        self.req_svc_results = []
+        self.req_svc_results: Results = []
 
-    def find_python_files(self, directory):
+    def find_python_files(self, directory) -> list[str]:
         """
         Find Python files in the given directory.
 
@@ -66,7 +82,7 @@ class DecoratorProcessor:
                     python_files.append(os.path.join(root, file))
         return python_files
 
-    def get_functions_and_classes(self, file_path, decorator_names):
+    def get_functions_and_classes(self, file_path, decorator_names) -> None:
         """
         Get information about functions and classes, if annotated with "Requirements" or "SVCs":
         decorator filepath, elementKind, name and decorators is saved to list that is returned.
@@ -89,7 +105,7 @@ class DecoratorProcessor:
 
         for node in ast.walk(tree):
             if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
-                decorators_info = []
+                decorators_info: list[DecoratorInfo] = []
                 for decorator_node in getattr(node, "decorator_list", []):
                     if isinstance(decorator_node, ast.Call) and isinstance(decorator_node.func, ast.Name):
                         decorator_name = decorator_node.func.id
@@ -106,7 +122,7 @@ class DecoratorProcessor:
                         }
                     )
 
-    def write_to_yaml(self, output_file, formatted_data):
+    def write_to_yaml(self, output_file, formatted_data) -> None:
         """
         Write formatted data to a YAML file.
 
@@ -135,7 +151,7 @@ class DecoratorProcessor:
         mapping = {item.from_value: item.to_value for item in DECORATOR_TYPES}
         return mapping.get(input_str, input_str)
 
-    def format_results(self, results):
+    def format_results(self, results: Results) -> dict:
         """
         Format the collected results into a structured data format for YAML.
 
