@@ -13,27 +13,28 @@ def process_decorator_instance():
 # ---------------------------------------------------------------------------
 
 
-def test_find_python_files(process_decorator_instance: DecoratorProcessor, tmpdir):
-    tmpdir.join("pythonfile.py").write("content")
-    result = process_decorator_instance.find_python_files(tmpdir)
-    assert result == [str(tmpdir.join("pythonfile.py"))]
+def test_find_python_files(process_decorator_instance: DecoratorProcessor, tmp_path):
+    (tmp_path / "pythonfile.py").write_text("content")
+    result = process_decorator_instance.find_python_files(tmp_path)
+    assert result == [str(tmp_path / "pythonfile.py")]
 
 
-def test_find_python_files_empty_dir(process_decorator_instance: DecoratorProcessor, tmpdir):
-    result = process_decorator_instance.find_python_files(tmpdir)
+def test_find_python_files_empty_dir(process_decorator_instance: DecoratorProcessor, tmp_path):
+    result = process_decorator_instance.find_python_files(tmp_path)
     assert result == []
 
 
-def test_find_python_files_nested(process_decorator_instance: DecoratorProcessor, tmpdir):
-    sub = tmpdir.mkdir("sub")
-    sub.join("nested.py").write("content")
-    result = process_decorator_instance.find_python_files(tmpdir)
-    assert str(sub.join("nested.py")) in result
+def test_find_python_files_nested(process_decorator_instance: DecoratorProcessor, tmp_path):
+    sub = tmp_path / "sub"
+    sub.mkdir()
+    (sub / "nested.py").write_text("content")
+    result = process_decorator_instance.find_python_files(tmp_path)
+    assert str(sub / "nested.py") in result
 
 
-def test_find_python_files_ignores_non_py(process_decorator_instance: DecoratorProcessor, tmpdir):
-    tmpdir.join("readme.txt").write("content")
-    result = process_decorator_instance.find_python_files(tmpdir)
+def test_find_python_files_ignores_non_py(process_decorator_instance: DecoratorProcessor, tmp_path):
+    (tmp_path / "readme.txt").write_text("content")
+    result = process_decorator_instance.find_python_files(tmp_path)
     assert result == []
 
 
@@ -42,9 +43,9 @@ def test_find_python_files_ignores_non_py(process_decorator_instance: DecoratorP
 # ---------------------------------------------------------------------------
 
 
-def test_get_functions_and_classes(process_decorator_instance: DecoratorProcessor, tmpdir):
-    file_path = str(tmpdir.join("test_file.py"))
-    tmpdir.join("test_file.py").write('@SVCs("SVC_001")\nclass Test:\n  pass')
+def test_get_functions_and_classes(process_decorator_instance: DecoratorProcessor, tmp_path):
+    file_path = tmp_path / "test_file.py"
+    file_path.write_text('@SVCs("SVC_001")\nclass Test:\n  pass')
     process_decorator_instance.get_functions_and_classes(file_path, ["SVCs"])
     assert process_decorator_instance.req_svc_results[0]["name"] == "Test"
     assert process_decorator_instance.req_svc_results[0]["decorators"][0]["args"][0] == "SVC_001"
@@ -52,9 +53,9 @@ def test_get_functions_and_classes(process_decorator_instance: DecoratorProcesso
     assert process_decorator_instance.req_svc_results[0]["elementKind"] == "CLASS"
 
 
-def test_get_functions_and_classes_function_def(process_decorator_instance: DecoratorProcessor, tmpdir):
-    file_path = str(tmpdir.join("f.py"))
-    tmpdir.join("f.py").write('@Requirements("REQ_001")\ndef my_func():\n    pass')
+def test_get_functions_and_classes_function_def(process_decorator_instance: DecoratorProcessor, tmp_path):
+    file_path = tmp_path / "f.py"
+    file_path.write_text('@Requirements("REQ_001")\ndef my_func():\n    pass')
     process_decorator_instance.get_functions_and_classes(file_path, ["Requirements"])
     assert len(process_decorator_instance.req_svc_results) == 1
     result = process_decorator_instance.req_svc_results[0]
@@ -62,9 +63,9 @@ def test_get_functions_and_classes_function_def(process_decorator_instance: Deco
     assert result["elementKind"] == "FUNCTION"
 
 
-def test_get_functions_and_classes_async_function_def(process_decorator_instance: DecoratorProcessor, tmpdir):
-    file_path = str(tmpdir.join("af.py"))
-    tmpdir.join("af.py").write('@Requirements("REQ_001")\nasync def my_async():\n    pass')
+def test_get_functions_and_classes_async_function_def(process_decorator_instance: DecoratorProcessor, tmp_path):
+    file_path = tmp_path / "af.py"
+    file_path.write_text('@Requirements("REQ_001")\nasync def my_async():\n    pass')
     process_decorator_instance.get_functions_and_classes(file_path, ["Requirements"])
     assert len(process_decorator_instance.req_svc_results) == 1
     result = process_decorator_instance.req_svc_results[0]
@@ -72,9 +73,9 @@ def test_get_functions_and_classes_async_function_def(process_decorator_instance
     assert result["elementKind"] == "ASYNCFUNCTION"
 
 
-def test_get_functions_and_classes_multiple_args(process_decorator_instance: DecoratorProcessor, tmpdir):
-    file_path = str(tmpdir.join("m.py"))
-    tmpdir.join("m.py").write('@Requirements("A", "B")\ndef func():\n    pass')
+def test_get_functions_and_classes_multiple_args(process_decorator_instance: DecoratorProcessor, tmp_path):
+    file_path = tmp_path / "m.py"
+    file_path.write_text('@Requirements("A", "B")\ndef func():\n    pass')
     process_decorator_instance.get_functions_and_classes(file_path, ["Requirements"])
     args = process_decorator_instance.req_svc_results[0]["decorators"][0]["args"]
     assert args == ["A", "B"]
@@ -89,28 +90,28 @@ def test_get_functions_and_classes_multiple_args(process_decorator_instance: Dec
     ],
 )
 def test_get_functions_and_classes_element_kind(
-    process_decorator_instance: DecoratorProcessor, tmpdir, code, expected_kind
+    process_decorator_instance: DecoratorProcessor, tmp_path, code, expected_kind
 ):
     """Fix 4: elementKind must be derived from __class__.__name__, not CPython repr."""
-    f = tmpdir.join("f.py")
-    f.write(code)
-    process_decorator_instance.get_functions_and_classes(str(f), ["Requirements"])
+    f = tmp_path / "f.py"
+    f.write_text(code)
+    process_decorator_instance.get_functions_and_classes(f, ["Requirements"])
     assert process_decorator_instance.req_svc_results[0]["elementKind"] == expected_kind
 
 
-def test_get_functions_and_classes_no_match(process_decorator_instance: DecoratorProcessor, tmpdir):
-    file_path = str(tmpdir.join("n.py"))
-    tmpdir.join("n.py").write('@OtherDecorator("X")\ndef func():\n    pass')
+def test_get_functions_and_classes_no_match(process_decorator_instance: DecoratorProcessor, tmp_path):
+    file_path = tmp_path / "n.py"
+    file_path.write_text('@OtherDecorator("X")\ndef func():\n    pass')
     process_decorator_instance.get_functions_and_classes(file_path, ["Requirements"])
     assert process_decorator_instance.req_svc_results == []
 
 
 def test_get_functions_and_classes_multiple_decorators_on_func(
-    process_decorator_instance: DecoratorProcessor, tmpdir
+    process_decorator_instance: DecoratorProcessor, tmp_path
 ):
-    file_path = str(tmpdir.join("md.py"))
+    file_path = tmp_path / "md.py"
     code = '@Requirements("REQ_001")\n@SVCs("SVC_001")\ndef func():\n    pass'
-    tmpdir.join("md.py").write(code)
+    file_path.write_text(code)
     process_decorator_instance.get_functions_and_classes(file_path, ["Requirements", "SVCs"])
     assert len(process_decorator_instance.req_svc_results) == 1
     names = [d["name"] for d in process_decorator_instance.req_svc_results[0]["decorators"]]
@@ -140,7 +141,7 @@ def test_map_type_unknown_type(process_decorator_instance: DecoratorProcessor):
 # ---------------------------------------------------------------------------
 
 
-def test_format_results_implementations(process_decorator_instance: DecoratorProcessor, tmpdir):
+def test_format_results_implementations(process_decorator_instance: DecoratorProcessor):
     results = [
         {
             "fullyQualifiedName": "my.module.py",
@@ -252,14 +253,12 @@ def test_process_decorated_data_produces_yaml(process_decorator_instance: Decora
     src_file.parent.mkdir()
     src_file.write_text('@Requirements("REQ_001")\ndef my_func():\n    pass\n')
 
-    output_file = str(tmp_path / "out" / "annotations.yml")
+    output_file = tmp_path / "out" / "annotations.yml"
     process_decorator_instance.process_decorated_data(
         path_to_python_files=[str(src_file.parent)], output_file=output_file
     )
 
-    import os
-
-    assert os.path.exists(output_file)
+    assert output_file.exists()
 
 
 def test_process_decorated_data_correct_structure(process_decorator_instance: DecoratorProcessor, tmp_path):
@@ -267,7 +266,7 @@ def test_process_decorated_data_correct_structure(process_decorator_instance: De
     src_file.parent.mkdir()
     src_file.write_text('@Requirements("REQ_001")\ndef my_func():\n    pass\n')
 
-    output_file = str(tmp_path / "out" / "annotations.yml")
+    output_file = tmp_path / "out" / "annotations.yml"
     process_decorator_instance.process_decorated_data(
         path_to_python_files=[str(src_file.parent)], output_file=output_file
     )
@@ -285,7 +284,7 @@ def test_process_decorated_data_no_state_accumulation(process_decorator_instance
     src_file.parent.mkdir()
     src_file.write_text('@Requirements("REQ_001")\ndef my_func():\n    pass\n')
 
-    output_file = str(tmp_path / "out" / "annotations.yml")
+    output_file = tmp_path / "out" / "annotations.yml"
 
     # Call twice
     process_decorator_instance.process_decorated_data(

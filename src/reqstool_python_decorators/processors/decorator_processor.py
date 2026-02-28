@@ -32,6 +32,20 @@ class ElementResult(TypedDict):
     decorators: ReadOnly[list[DecoratorInfo]]
 
 
+class FormattedEntry(TypedDict):
+    elementKind: str
+    fullyQualifiedName: str
+
+
+class RequirementAnnotations(TypedDict):
+    implementations: dict[str, list[FormattedEntry]]
+    tests: dict[str, list[FormattedEntry]]
+
+
+class FormattedData(TypedDict):
+    requirement_annotations: RequirementAnnotations
+
+
 type Results = list[ElementResult]
 
 
@@ -65,12 +79,12 @@ class DecoratorProcessor:
         super().__init__(*args, **kwargs)
         self.req_svc_results: Results = []
 
-    def find_python_files(self, directory) -> list[str]:
+    def find_python_files(self, directory: str | os.PathLike) -> list[str]:
         """
         Find Python files in the given directory.
 
         Parameters:
-        - `directory` (str): The directory to search for Python files.
+        - `directory` (str | PathLike): The directory to search for Python files.
 
         Returns:
         - `python_files` (list): List of Python files found in the directory.
@@ -82,17 +96,16 @@ class DecoratorProcessor:
                     python_files.append(os.path.join(root, file))
         return python_files
 
-    def get_functions_and_classes(self, file_path, decorator_names) -> None:
+    def get_functions_and_classes(
+        self, file_path: str | os.PathLike, decorator_names: list[str]
+    ) -> None:
         """
         Get information about functions and classes, if annotated with "Requirements" or "SVCs":
         decorator filepath, elementKind, name and decorators is saved to list that is returned.
 
         Parameters:
-        - `file_path` (str): The path to the Python file.
-        - `decorator_names` (list): List of decorator names to search for.
-
-        Returns:
-        - `results` (list): List of dictionaries containing information about functions and classes.
+        - `file_path` (str | PathLike): The path to the Python file.
+        - `decorator_names` (list[str]): List of decorator names to search for.
 
         Each dictionary includes:
             - `fullyQualifiedName` (str): The fully qualified name of the file.
@@ -101,7 +114,7 @@ class DecoratorProcessor:
             - `decorators` (list): List of dictionaries with decorator info including name and arguments e.g. "REQ_001".
         """
         with open(file_path, "r") as file:
-            tree = ast.parse(file.read(), filename=file_path)
+            tree = ast.parse(file.read(), filename=str(file_path))
 
         for node in ast.walk(tree):
             if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
@@ -122,12 +135,12 @@ class DecoratorProcessor:
                         }
                     )
 
-    def write_to_yaml(self, output_file, formatted_data) -> None:
+    def write_to_yaml(self, output_file: str | os.PathLike, formatted_data) -> None:
         """
         Write formatted data to a YAML file.
 
         Parameters:
-        - `output_file` (str): The path to the output YAML file.
+        - `output_file` (str | PathLike): The path to the output YAML file.
         - `formatted_data` (dict): The formatted data to be written to the YAML file.
 
         Writes the formatted data to the specified YAML file.
@@ -151,7 +164,7 @@ class DecoratorProcessor:
         mapping = {item.from_value: item.to_value for item in DECORATOR_TYPES}
         return mapping.get(input_str, input_str)
 
-    def format_results(self, results: Results) -> dict:
+    def format_results(self, results: Results) -> FormattedData:
         """
         Format the collected results into a structured data format for YAML.
 
@@ -159,17 +172,17 @@ class DecoratorProcessor:
         - `results` (list): List of dictionaries containing information about functions and classes.
 
         Returns:
-        - `formatted_data` (dict): Formatted data in a structured `yaml_language_server` compatible format.
+        - `formatted_data` (FormattedData): Formatted data in a structured `yaml_language_server` compatible format.
 
         This function formats a list of decorated data into the structure required by the `yaml_language_server`.
         It includes version information, requirement annotations, and relevant element information.
         """
 
-        formatted_data = {}
-        implementations = {}
-        tests = {}
-        requirement_annotations = {"implementations": implementations, "tests": tests}
-        formatted_data["requirement_annotations"] = requirement_annotations
+        implementations: dict[str, list[FormattedEntry]] = {}
+        tests: dict[str, list[FormattedEntry]] = {}
+        formatted_data: FormattedData = {
+            "requirement_annotations": {"implementations": implementations, "tests": tests}
+        }
 
         for result in results:
             for decorator_info in result["decorators"]:
@@ -190,26 +203,28 @@ class DecoratorProcessor:
 
         return formatted_data
 
-    def create_dir_from_path(self, filepath: str) -> None:
+    def create_dir_from_path(self, filepath: str | os.PathLike) -> None:
         """
         Creates directory of provided filepath if it does not exists
 
         Parameters:
-        - `filepath` (str): Filepath to check and create directory from.
+        - `filepath` (str | PathLike): Filepath to check and create directory from.
         """
         directory = os.path.dirname(filepath)
         if not os.path.exists(directory):
             os.makedirs(directory)
 
     def process_decorated_data(
-        self, path_to_python_files: str, output_file: str = "build/reqstool/annotations.yml"
+        self,
+        path_to_python_files: list[str | os.PathLike],
+        output_file: str | os.PathLike = "build/reqstool/annotations.yml",
     ) -> None:
         """
         "Main" function, runs all functions resulting in  a yaml file containing decorated data.
 
         Parameters:
         - `path_to_python_files` (list): List of directories containing Python files.
-        - `output_file` (str): Set path for output file, defaults to build/annotations.yml
+        - `output_file` (str | PathLike): Set path for output file, defaults to build/annotations.yml
 
         This method takes a list of directories containing Python files, collects decorated data from these files,
         formats the collected data, and writes the formatted results to YAML file for Requirements and SVCs annotations.
