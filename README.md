@@ -45,7 +45,7 @@ reqstool-python-decorators = "<version>"
 Import decorators:
 
 ```
-from reqstool-decorators.decorators.decorators import Requirements, SVCs
+from reqstool_python_decorators.decorators.decorators import Requirements, SVCs
 ```
 
 Example usage of the decorators:
@@ -65,7 +65,7 @@ def test_somefunction():
 Import processor:
 
 ```
-from reqstool.processors.decorator_processor import DecoratorProcessor
+from reqstool_python_decorators.processors.decorator_processor import DecoratorProcessor
 ```
 
 Main function to collect decorators data and generate yaml file:

@@ -1,4 +1,4 @@
-from src.reqstool_decorators.decorators.decorators import Requirements
+from reqstool_python_decorators.decorators.decorators import Requirements
 
 
 @Requirements("REQ_001", "REQ_222")
