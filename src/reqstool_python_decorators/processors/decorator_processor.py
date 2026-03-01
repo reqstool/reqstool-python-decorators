@@ -127,7 +127,7 @@ class DecoratorProcessor:
                     self.req_svc_results.append(
                         {
                             "fullyQualifiedName": str(file_path).replace("/", "."),
-                            "elementKind": node.__class__.__name__[:-3].upper(),
+                            "elementKind": node.__class__.__name__.removesuffix("Def").upper(),
                             "name": node.name,
                             "decorators": decorators_info,
                         }
