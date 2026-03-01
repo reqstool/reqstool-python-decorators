@@ -1,4 +1,4 @@
-from src.reqstool_decorators.decorators.decorators import SVCs
+from reqstool_python_decorators.decorators.decorators import SVCs
 
 
 @SVCs("SVC_999")
