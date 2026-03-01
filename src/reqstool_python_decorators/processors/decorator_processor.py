@@ -66,9 +66,7 @@ class DecoratorProcessor:
                     python_files.append(os.path.join(root, file))
         return python_files
 
-    def get_functions_and_classes(
-        self, file_path: str | os.PathLike, decorator_names: list[str]
-    ) -> None:
+    def get_functions_and_classes(self, file_path: str | os.PathLike, decorator_names: list[str]) -> None:
         """
         Get information about functions and classes, if annotated with "Requirements" or "SVCs":
         decorator filepath, elementKind, name and decorators is saved to list that is returned.
