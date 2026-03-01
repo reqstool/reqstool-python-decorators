@@ -2,6 +2,7 @@
 
 from enum import Enum, unique
 import os
+from typing import ReadOnly, TypedDict
 from ruamel.yaml import YAML
 import ast
 
@@ -17,6 +18,35 @@ class DECORATOR_TYPES(Enum):
 
     def get_from_to(self):
         return f"from: {self.from_value}, to: {self.to_value}"
+
+
+class DecoratorInfo(TypedDict):
+    name: ReadOnly[str]
+    args: ReadOnly[list[str]]
+
+
+class ElementResult(TypedDict):
+    fullyQualifiedName: ReadOnly[str]
+    elementKind: ReadOnly[str]
+    name: ReadOnly[str]
+    decorators: ReadOnly[list[DecoratorInfo]]
+
+
+class FormattedEntry(TypedDict):
+    elementKind: str
+    fullyQualifiedName: str
+
+
+class RequirementAnnotations(TypedDict):
+    implementations: dict[str, list[FormattedEntry]]
+    tests: dict[str, list[FormattedEntry]]
+
+
+class FormattedData(TypedDict):
+    requirement_annotations: RequirementAnnotations
+
+
+type Results = list[ElementResult]
 
 
 class DecoratorProcessor:
@@ -47,7 +77,7 @@ class DecoratorProcessor:
 
         """
         super().__init__(*args, **kwargs)
-        self.req_svc_results = []
+        self.req_svc_results: Results = []
 
     def find_python_files(self, directory: str | os.PathLike) -> list[str]:
         """
@@ -86,7 +116,7 @@ class DecoratorProcessor:
 
         for node in ast.walk(tree):
             if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
-                decorators_info = []
+                decorators_info: list[DecoratorInfo] = []
                 for decorator_node in getattr(node, "decorator_list", []):
                     if isinstance(decorator_node, ast.Call) and isinstance(decorator_node.func, ast.Name):
                         decorator_name = decorator_node.func.id
@@ -132,7 +162,7 @@ class DecoratorProcessor:
         mapping = {item.from_value: item.to_value for item in DECORATOR_TYPES}
         return mapping.get(input_str, input_str)
 
-    def format_results(self, results) -> dict:
+    def format_results(self, results: Results) -> FormattedData:
         """
         Format the collected results into a structured data format for YAML.
 
@@ -140,17 +170,17 @@ class DecoratorProcessor:
         - `results` (list): List of dictionaries containing information about functions and classes.
 
         Returns:
-        - `formatted_data` (dict): Formatted data in a structured `yaml_language_server` compatible format.
+        - `formatted_data` (FormattedData): Formatted data in a structured `yaml_language_server` compatible format.
 
         This function formats a list of decorated data into the structure required by the `yaml_language_server`.
         It includes version information, requirement annotations, and relevant element information.
         """
 
-        formatted_data = {}
-        implementations = {}
-        tests = {}
-        requirement_annotations = {"implementations": implementations, "tests": tests}
-        formatted_data["requirement_annotations"] = requirement_annotations
+        implementations: dict[str, list[FormattedEntry]] = {}
+        tests: dict[str, list[FormattedEntry]] = {}
+        formatted_data: FormattedData = {
+            "requirement_annotations": {"implementations": implementations, "tests": tests}
+        }
 
         for result in results:
             for decorator_info in result["decorators"]:
