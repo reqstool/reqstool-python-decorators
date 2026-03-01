@@ -11,6 +11,10 @@
 
 This provides decorators and collecting of decorated code, formatting it and writing to yaml file.
 
+## Requirements
+
+- Python >= 3.13
+
 ## Installation
 
 The package name is `reqstool-python-decorators`.
