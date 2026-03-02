@@ -181,3 +181,6 @@ __pycache__/
 *.odt
 *.ods
 *.odp
+
+# Claude Code
+.claude/
