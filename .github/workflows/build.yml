@@ -28,8 +28,8 @@ jobs:
           python-version: "3.13"
       - name: Install dependencies
         run: pip install hatch
-      - name: Run unit and integrations tests
-        run: hatch run dev:pytest --cov=reqstool-python-decorators --cov-report=xml --cov-report=html
+      - name: Run tests
+        run: hatch run dev:pytest --junitxml=build/junit.xml --cov=reqstool_python_decorators --cov-report=xml:build/coverage.xml
       - name: Build project
         run: hatch build
       # Upload artifacts for later use
