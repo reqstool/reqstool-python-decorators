@@ -2,6 +2,11 @@
 
 This provides decorators and collecting of decorated code, formatting it and writing to yaml file.
 
+== Related components
+
+* xref:reqstool-python-hatch-plugin::index.adoc[Hatch Plugin] -- packages decorators output into a reqstool artifact during Hatch builds
+* xref:reqstool-python-poetry-plugin::index.adoc[Poetry Plugin] -- packages decorators output into a reqstool artifact during Poetry builds
+
 == License
 
 MIT License.
