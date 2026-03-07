@@ -8,7 +8,7 @@
 
 Python decorators for [reqstool](https://github.com/reqstool/reqstool-client) requirements traceability. Provides `@Requirements` and `@SVCs` decorators for linking Python code to requirements and software verification cases.
 
-## Requirements
+## Prerequisites
 
 - Python >= 3.13
 
