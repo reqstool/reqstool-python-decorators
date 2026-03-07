@@ -4,54 +4,60 @@
 
 * Hatch
 
-```
+[source,toml]
+----
 dependencies = [
     "reqstool-python-decorators == <version>"
 ]
-```
+----
 
 * Poetry
 
-```
+[source,toml]
+----
 [tool.poetry.dependencies]
 reqstool-python-decorators = "<version>"
-```
+----
 
 === Decorators
 
 Import decorators:
 
-```
+[source,python]
+----
 from reqstool_python_decorators.decorators.decorators import Requirements, SVCs
-```
+----
 
 Example usage of the decorators:
 
-```python
+[source,python]
+----
 @Requirements("REQ_111", "REQ_222")
 def somefunction():
-```
+----
 
-```python
+[source,python]
+----
 @SVCs("SVC_111", "SVC_222")
 def test_somefunction():
-```
+----
 
 === Processor
 
 Import processor:
 
-```
+[source,python]
+----
 from reqstool_python_decorators.processors.decorator_processor import DecoratorProcessor
-```
+----
 
 Main function to collect decorators data and generate yaml file:
 
-```
+[source,python]
+----
 process_decorated_data(path_to_python_files, output_file)
-```
+----
 
 `path_to_python_files` is the directories to search through to find decorated code.
 
 (Optional) `output_file` is output file(path) the yaml file is stored to. Default is `/build/reqstool/annotations.yml`.
-

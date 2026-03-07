@@ -1,3 +1,0 @@
-== Description
-
-This provides decorators and collecting of decorated code, formatting it and writing to yaml file.

@@ -2,8 +2,7 @@
 
 The package name is `reqstool-python-decorators`.
 
-* Using pip:
-
-```
+[source,bash]
+----
 pip install reqstool-python-decorators
-```
+----
