@@ -5,6 +5,9 @@ on:
   pull_request_target:
     types: [opened, edited, synchronize, reopened]
 
+permissions:
+  pull-requests: read
+
 jobs:
   check:
-    uses: reqstool/.github/.github/workflows/check-semantic-pr.yml@main
+    uses: reqstool/.github/.github/workflows/common-check-semantic-pr.yml@main
