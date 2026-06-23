@@ -11,6 +11,7 @@ def Requirements[T: Callable](*requirements: str) -> Callable[[T], T]:
     return decorator
 
 
+@Requirements("DECORATORS_001")
 def SVCs[T: Callable](*svc_ids: str) -> Callable[[T], T]:
     def decorator(func: T) -> T:
         func.svc_ids = svc_ids  # type: ignore[attr-defined]

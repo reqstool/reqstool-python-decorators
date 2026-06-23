@@ -1,4 +1,5 @@
 import pytest
+from reqstool_python_decorators.decorators.decorators import SVCs
 from reqstool_python_decorators.processors.decorator_processor import DecoratorProcessor
 from ruamel.yaml import YAML
 
@@ -13,17 +14,20 @@ def process_decorator_instance():
 # ---------------------------------------------------------------------------
 
 
+@SVCs("SVC_DECORATORS_002")
 def test_find_python_files(process_decorator_instance: DecoratorProcessor, tmp_path):
     (tmp_path / "pythonfile.py").write_text("content")
     result = process_decorator_instance.find_python_files(tmp_path)
     assert result == [str(tmp_path / "pythonfile.py")]
 
 
+@SVCs("SVC_DECORATORS_002")
 def test_find_python_files_empty_dir(process_decorator_instance: DecoratorProcessor, tmp_path):
     result = process_decorator_instance.find_python_files(tmp_path)
     assert result == []
 
 
+@SVCs("SVC_DECORATORS_002")
 def test_find_python_files_nested(process_decorator_instance: DecoratorProcessor, tmp_path):
     sub = tmp_path / "sub"
     sub.mkdir()
@@ -32,6 +36,7 @@ def test_find_python_files_nested(process_decorator_instance: DecoratorProcessor
     assert str(sub / "nested.py") in result
 
 
+@SVCs("SVC_DECORATORS_002")
 def test_find_python_files_ignores_non_py(process_decorator_instance: DecoratorProcessor, tmp_path):
     (tmp_path / "readme.txt").write_text("content")
     result = process_decorator_instance.find_python_files(tmp_path)
@@ -43,6 +48,7 @@ def test_find_python_files_ignores_non_py(process_decorator_instance: DecoratorP
 # ---------------------------------------------------------------------------
 
 
+@SVCs("SVC_DECORATORS_002")
 def test_get_functions_and_classes(process_decorator_instance: DecoratorProcessor, tmp_path):
     file_path = tmp_path / "test_file.py"
     file_path.write_text('@SVCs("SVC_001")\nclass Test:\n  pass')
@@ -53,6 +59,7 @@ def test_get_functions_and_classes(process_decorator_instance: DecoratorProcesso
     assert process_decorator_instance.req_svc_results[0]["elementKind"] == "CLASS"
 
 
+@SVCs("SVC_DECORATORS_002")
 def test_get_functions_and_classes_function_def(process_decorator_instance: DecoratorProcessor, tmp_path):
     file_path = tmp_path / "f.py"
     file_path.write_text('@Requirements("REQ_001")\ndef my_func():\n    pass')
@@ -63,6 +70,7 @@ def test_get_functions_and_classes_function_def(process_decorator_instance: Deco
     assert result["elementKind"] == "FUNCTION"
 
 
+@SVCs("SVC_DECORATORS_002")
 def test_get_functions_and_classes_async_function_def(process_decorator_instance: DecoratorProcessor, tmp_path):
     file_path = tmp_path / "af.py"
     file_path.write_text('@Requirements("REQ_001")\nasync def my_async():\n    pass')
@@ -73,6 +81,7 @@ def test_get_functions_and_classes_async_function_def(process_decorator_instance
     assert result["elementKind"] == "ASYNCFUNCTION"
 
 
+@SVCs("SVC_DECORATORS_002")
 def test_get_functions_and_classes_multiple_args(process_decorator_instance: DecoratorProcessor, tmp_path):
     file_path = tmp_path / "m.py"
     file_path.write_text('@Requirements("A", "B")\ndef func():\n    pass')
@@ -81,6 +90,7 @@ def test_get_functions_and_classes_multiple_args(process_decorator_instance: Dec
     assert args == ["A", "B"]
 
 
+@SVCs("SVC_DECORATORS_002")
 @pytest.mark.parametrize(
     "code,expected_kind",
     [
@@ -99,6 +109,7 @@ def test_get_functions_and_classes_element_kind(
     assert process_decorator_instance.req_svc_results[0]["elementKind"] == expected_kind
 
 
+@SVCs("SVC_DECORATORS_002")
 def test_get_functions_and_classes_no_match(process_decorator_instance: DecoratorProcessor, tmp_path):
     file_path = tmp_path / "n.py"
     file_path.write_text('@OtherDecorator("X")\ndef func():\n    pass')
@@ -106,6 +117,7 @@ def test_get_functions_and_classes_no_match(process_decorator_instance: Decorato
     assert process_decorator_instance.req_svc_results == []
 
 
+@SVCs("SVC_DECORATORS_002")
 def test_get_functions_and_classes_multiple_decorators_on_func(
     process_decorator_instance: DecoratorProcessor, tmp_path
 ):
@@ -124,6 +136,7 @@ def test_get_functions_and_classes_multiple_decorators_on_func(
 # ---------------------------------------------------------------------------
 
 
+@SVCs("SVC_DECORATORS_002")
 def test_map_type_known_type(process_decorator_instance: DecoratorProcessor):
     map_funcion = process_decorator_instance.map_type("FUNCTION")
     map_asyncfunction = process_decorator_instance.map_type("ASYNCFUNCTION")
@@ -131,6 +144,7 @@ def test_map_type_known_type(process_decorator_instance: DecoratorProcessor):
     assert map_asyncfunction == "METHOD"
 
 
+@SVCs("SVC_DECORATORS_002")
 def test_map_type_unknown_type(process_decorator_instance: DecoratorProcessor):
     result = process_decorator_instance.map_type("CLASS")
     assert result == "CLASS"
@@ -141,6 +155,7 @@ def test_map_type_unknown_type(process_decorator_instance: DecoratorProcessor):
 # ---------------------------------------------------------------------------
 
 
+@SVCs("SVC_DECORATORS_002")
 def test_format_results_implementations(process_decorator_instance: DecoratorProcessor):
     results = [
         {
@@ -154,6 +169,7 @@ def test_format_results_implementations(process_decorator_instance: DecoratorPro
     assert "REQ_001" in data["requirement_annotations"]["implementations"]
 
 
+@SVCs("SVC_DECORATORS_002")
 def test_format_results_tests(process_decorator_instance: DecoratorProcessor):
     results = [
         {
@@ -167,6 +183,7 @@ def test_format_results_tests(process_decorator_instance: DecoratorProcessor):
     assert "SVC_001" in data["requirement_annotations"]["tests"]
 
 
+@SVCs("SVC_DECORATORS_002")
 def test_format_results_multiple_ids(process_decorator_instance: DecoratorProcessor):
     results = [
         {
@@ -182,6 +199,7 @@ def test_format_results_multiple_ids(process_decorator_instance: DecoratorProces
     assert "REQ_002" in impls
 
 
+@SVCs("SVC_DECORATORS_002")
 def test_format_results_fully_qualified_name(process_decorator_instance: DecoratorProcessor):
     results = [
         {
@@ -201,6 +219,7 @@ def test_format_results_fully_qualified_name(process_decorator_instance: Decorat
 # ---------------------------------------------------------------------------
 
 
+@SVCs("SVC_DECORATORS_003")
 def test_write_to_yaml(process_decorator_instance: DecoratorProcessor, tmp_path):
     yaml_language_server = "# yaml-language-server: $schema=https://raw.githubusercontent.com/reqstool/reqstool-client/main/src/reqstool/resources/schemas/v1/annotations.schema.json\n"  # noqa: E501
 
@@ -229,6 +248,7 @@ def test_write_to_yaml(process_decorator_instance: DecoratorProcessor, tmp_path)
 # ---------------------------------------------------------------------------
 
 
+@SVCs("SVC_DECORATORS_003")
 def test_create_dir_from_path_creates_dir(process_decorator_instance: DecoratorProcessor, tmp_path):
     new_dir = tmp_path / "new_subdir"
     filepath = str(new_dir / "output.yml")
@@ -236,6 +256,7 @@ def test_create_dir_from_path_creates_dir(process_decorator_instance: DecoratorP
     assert new_dir.exists()
 
 
+@SVCs("SVC_DECORATORS_003")
 def test_create_dir_from_path_existing_dir(process_decorator_instance: DecoratorProcessor, tmp_path):
     filepath = str(tmp_path / "output.yml")
     # tmp_path already exists — should not raise
@@ -248,6 +269,7 @@ def test_create_dir_from_path_existing_dir(process_decorator_instance: Decorator
 # ---------------------------------------------------------------------------
 
 
+@SVCs("SVC_DECORATORS_002", "SVC_DECORATORS_003")
 def test_process_decorated_data_produces_yaml(process_decorator_instance: DecoratorProcessor, tmp_path):
     src_file = tmp_path / "src" / "app.py"
     src_file.parent.mkdir()
@@ -261,6 +283,7 @@ def test_process_decorated_data_produces_yaml(process_decorator_instance: Decora
     assert output_file.exists()
 
 
+@SVCs("SVC_DECORATORS_002", "SVC_DECORATORS_003")
 def test_process_decorated_data_correct_structure(process_decorator_instance: DecoratorProcessor, tmp_path):
     src_file = tmp_path / "src" / "app.py"
     src_file.parent.mkdir()
@@ -279,6 +302,7 @@ def test_process_decorated_data_correct_structure(process_decorator_instance: De
     assert "REQ_001" in data["requirement_annotations"]["implementations"]
 
 
+@SVCs("SVC_DECORATORS_002", "SVC_DECORATORS_003")
 def test_process_decorated_data_no_state_accumulation(process_decorator_instance: DecoratorProcessor, tmp_path):
     src_file = tmp_path / "src" / "app.py"
     src_file.parent.mkdir()

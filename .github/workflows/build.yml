@@ -11,6 +11,9 @@ on:
       - reopened
       - synchronize
 
+permissions:
+  contents: read
+
 jobs:
   linting:
     name: Reuse linting job
@@ -19,6 +22,10 @@ jobs:
   build:
     needs: linting
     runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        reqstool-source: [pypi, main]
     steps:
       - name: Check out source repository
         uses: actions/checkout@v6
@@ -34,9 +41,27 @@ jobs:
         run: hatch run dev:pytest --junitxml=build/junit.xml --cov=reqstool_python_decorators --cov-report=xml:build/coverage.xml
       - name: Build project
         run: hatch build
+      - name: Self-apply own decorator processor to own src/tests
+        run: hatch run dev:python scripts/generate_annotations.py
+      - name: Install reqstool
+        uses: reqstool/.github/.github/actions/install-reqstool@9c6feaab046f4782f430dd2527fdb82c2a5cd926 # main 2026-06-22
+        with:
+          reqstool-source: ${{ matrix.reqstool-source }}
+      - name: Validate reqstool spec completeness
+        # not yet available in the latest PyPI release
+        if: matrix.reqstool-source == 'main'
+        uses: reqstool/.github/.github/actions/validate-reqstool@9c6feaab046f4782f430dd2527fdb82c2a5cd926 # main 2026-06-22
+      - name: Run reqstool status
+        uses: reqstool/.github/.github/actions/reqstool-status@9c6feaab046f4782f430dd2527fdb82c2a5cd926 # main 2026-06-22
+        with:
+          fail-if-incomplete: "true"
       # Upload artifacts for later use
       - name: Upload Artifacts
+        if: matrix.reqstool-source == 'pypi'
         uses: actions/upload-artifact@v7
         with:
           name: dist
           path: dist/
+
+  validate-openspec:
+    uses: reqstool/.github/.github/workflows/common-validate-openspec.yml@9c6feaab046f4782f430dd2527fdb82c2a5cd926 # main 2026-06-22

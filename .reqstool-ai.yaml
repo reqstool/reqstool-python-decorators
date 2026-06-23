@@ -1,0 +1,32 @@
+# reqstool-ai configuration
+#
+# This file tells reqstool-ai skills where to find your reqstool files
+# and how to generate IDs for new requirements and SVCs.
+#
+# Place this file at: .reqstool-ai.yaml (project root)
+
+# Project URN — matches the urn in your reqstool YAML files
+urn: reqstool-python-decorators
+
+# Revision string for new requirements and SVCs
+revision: "0.1.0"
+
+# System-level reqstool directory (contains the SSOT requirements and SVCs)
+system:
+  path: docs/reqstool
+
+# Subproject modules — each module imports a subset of requirements/SVCs via filters
+#
+# Required fields per module:
+#   path       — path to the module's reqstool directory (contains filter files)
+#   req_prefix — prefix for requirement IDs belonging to this module (e.g., CORE_)
+#   svc_prefix — prefix for SVC IDs belonging to this module (e.g., SVC_CORE_)
+#
+# Add as many modules as your project has. The module name (key) is used in
+# commands like `/reqstool:status core` and `/reqstool:add-req core`.
+modules:
+  # Matches the existing DECORATORS_NNN / SVC_DECORATORS_NNN ID convention.
+  decorators:
+    path: docs/reqstool
+    req_prefix: "DECORATORS_"
+    svc_prefix: "SVC_DECORATORS_"
