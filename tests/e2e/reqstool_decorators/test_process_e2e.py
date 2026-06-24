@@ -20,9 +20,14 @@ def test_process_decorated_data_against_fixture_files(tmp_path):
 
     DecoratorProcessor().process_decorated_data(path_to_python_files=[fixtures_dir], output_file=output_file)
 
-    yaml = YAML()
+    yaml_language_server = "# yaml-language-server: $schema=https://raw.githubusercontent.com/reqstool/reqstool-client/main/src/reqstool/resources/schemas/v1/annotations.schema.json\n"  # noqa: E501
+
     with open(output_file) as f:
-        data = yaml.load(f)
+        raw = f.read()
+    assert raw.startswith(yaml_language_server)
+
+    yaml = YAML()
+    data = yaml.load(raw)
 
     implementations = data["requirement_annotations"]["implementations"]
     tests = data["requirement_annotations"]["tests"]
@@ -33,6 +38,9 @@ def test_process_decorated_data_against_fixture_files(tmp_path):
     assert implementations["REQ_001"][0]["elementKind"] == "CLASS"
     assert implementations["REQ_333"][0]["elementKind"] == "METHOD"
     assert implementations["REQ_444"][0]["elementKind"] == "METHOD"
+
+    # fullyQualifiedName is built from the real on-disk file path, not a synthetic AST
+    assert implementations["REQ_333"][0]["fullyQualifiedName"].endswith("requirements_decorators.requirements_function")
 
     # SVC_999 is declared on both test functions in svc_decorators.py
     assert len(tests["SVC_999"]) == 2

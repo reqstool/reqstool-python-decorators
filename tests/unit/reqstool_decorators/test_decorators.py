@@ -1,5 +1,6 @@
 # Copyright © LFV
 
+import pytest
 from reqstool_python_decorators.decorators.decorators import Requirements, SVCs
 
 # NOTE: these tests apply Requirements/SVCs via direct call (`Requirements(...)(func)`)
@@ -9,101 +10,59 @@ from reqstool_python_decorators.decorators.decorators import Requirements, SVCs
 # polluting the project's own requirement/SVC traceability data with these fake IDs.
 
 
-@SVCs("SVC_DECORATORS_001")
-def test_requirements_sets_attribute():
-    def func():
-        pass
-
-    func = Requirements("REQ_001")(func)
-
-    assert func.requirements == ("REQ_001",)
+def _function():
+    pass
 
 
-@SVCs("SVC_DECORATORS_001")
-def test_requirements_multiple_ids():
-    def func():
-        pass
+async def _async_function():
+    pass
 
-    func = Requirements("A", "B")(func)
 
-    assert func.requirements == ("A", "B")
+class _Class:
+    pass
 
 
 @SVCs("SVC_DECORATORS_001")
-def test_requirements_preserves_function_name():
-    def my_function():
-        pass
+@pytest.mark.parametrize(
+    "decorator_factory,attr_name,target",
+    [
+        (Requirements, "requirements", _function),
+        (Requirements, "requirements", _async_function),
+        (Requirements, "requirements", _Class),
+        (SVCs, "svc_ids", _function),
+        (SVCs, "svc_ids", _async_function),
+        (SVCs, "svc_ids", _Class),
+    ],
+    ids=[
+        "requirements-on-function",
+        "requirements-on-async-function",
+        "requirements-on-class",
+        "svcs-on-function",
+        "svcs-on-async-function",
+        "svcs-on-class",
+    ],
+)
+def test_sets_attribute_on_target(decorator_factory, attr_name, target):
+    decorated = decorator_factory("REQ_001")(target)
 
-    my_function = Requirements("REQ_001")(my_function)
-
-    assert my_function.__name__ == "my_function"
-
-
-@SVCs("SVC_DECORATORS_001")
-def test_svcs_sets_attribute():
-    def func():
-        pass
-
-    func = SVCs("SVC_001")(func)
-
-    assert func.svc_ids == ("SVC_001",)
-
-
-@SVCs("SVC_DECORATORS_001")
-def test_svcs_multiple_ids():
-    def func():
-        pass
-
-    func = SVCs("A", "B")(func)
-
-    assert func.svc_ids == ("A", "B")
+    assert getattr(decorated, attr_name) == ("REQ_001",)
 
 
 @SVCs("SVC_DECORATORS_001")
-def test_svcs_preserves_function_name():
-    def my_function():
-        pass
+@pytest.mark.parametrize(
+    "decorator_factory,attr_name",
+    [(Requirements, "requirements"), (SVCs, "svc_ids")],
+    ids=["requirements", "svcs"],
+)
+def test_multiple_ids(decorator_factory, attr_name):
+    target = decorator_factory("A", "B")(_function)
 
-    my_function = SVCs("SVC_001")(my_function)
-
-    assert my_function.__name__ == "my_function"
-
-
-@SVCs("SVC_DECORATORS_001")
-def test_requirements_on_class():
-    class MyClass:
-        pass
-
-    MyClass = Requirements("REQ_001")(MyClass)
-
-    assert MyClass.requirements == ("REQ_001",)
+    assert getattr(target, attr_name) == ("A", "B")
 
 
 @SVCs("SVC_DECORATORS_001")
-def test_requirements_on_async_function():
-    async def my_async_function():
-        pass
+@pytest.mark.parametrize("decorator_factory", [Requirements, SVCs], ids=["requirements", "svcs"])
+def test_preserves_function_name(decorator_factory):
+    target = decorator_factory("REQ_001")(_function)
 
-    my_async_function = Requirements("REQ_001")(my_async_function)
-
-    assert my_async_function.requirements == ("REQ_001",)
-
-
-@SVCs("SVC_DECORATORS_001")
-def test_svcs_on_async_function():
-    async def my_async_function():
-        pass
-
-    my_async_function = SVCs("SVC_001")(my_async_function)
-
-    assert my_async_function.svc_ids == ("SVC_001",)
-
-
-@SVCs("SVC_DECORATORS_001")
-def test_svcs_on_class():
-    class MyClass:
-        pass
-
-    MyClass = SVCs("SVC_001")(MyClass)
-
-    assert MyClass.svc_ids == ("SVC_001",)
+    assert target.__name__ == "_function"
