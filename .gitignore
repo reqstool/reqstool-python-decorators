@@ -283,4 +283,5 @@ pyrightconfig.json
 # End of https://www.toptal.com/developers/gitignore/api/python,intellij+all,visualstudiocode
 
 # Claude Code
-.claude/
+.claude/*
+!.claude/settings.json

@@ -6,6 +6,8 @@ from typing import ReadOnly, TypedDict
 from ruamel.yaml import YAML
 import ast
 
+from reqstool_python_decorators.decorators.decorators import Requirements
+
 
 @unique
 class DECORATOR_TYPES(Enum):
@@ -79,6 +81,7 @@ class DecoratorProcessor:
         super().__init__(*args, **kwargs)
         self.req_svc_results: Results = []
 
+    @Requirements("DECORATORS_002")
     def find_python_files(self, directory: str | os.PathLike) -> list[str]:
         """
         Find Python files in the given directory.
@@ -96,6 +99,7 @@ class DecoratorProcessor:
                     python_files.append(os.path.join(root, file))
         return python_files
 
+    @Requirements("DECORATORS_002")
     def get_functions_and_classes(self, file_path: str | os.PathLike, decorator_names: list[str]) -> None:
         """
         Get information about functions and classes, if annotated with "Requirements" or "SVCs":
@@ -133,6 +137,7 @@ class DecoratorProcessor:
                         }
                     )
 
+    @Requirements("DECORATORS_003")
     def write_to_yaml(self, output_file: str | os.PathLike, formatted_data) -> None:
         """
         Write formatted data to a YAML file.
@@ -158,10 +163,12 @@ class DecoratorProcessor:
             yaml_file.write(self.yaml_language_server)
             yaml.dump(formatted_data, yaml_file)
 
+    @Requirements("DECORATORS_002")
     def map_type(self, input_str) -> str:
         mapping = {item.from_value: item.to_value for item in DECORATOR_TYPES}
         return mapping.get(input_str, input_str)
 
+    @Requirements("DECORATORS_002")
     def format_results(self, results: Results) -> FormattedData:
         """
         Format the collected results into a structured data format for YAML.
@@ -201,6 +208,7 @@ class DecoratorProcessor:
 
         return formatted_data
 
+    @Requirements("DECORATORS_003")
     def create_dir_from_path(self, filepath: str | os.PathLike) -> None:
         """
         Creates directory of provided filepath if it does not exists
@@ -212,6 +220,7 @@ class DecoratorProcessor:
         if not os.path.exists(directory):
             os.makedirs(directory)
 
+    @Requirements("DECORATORS_002", "DECORATORS_003")
     def process_decorated_data(
         self,
         path_to_python_files: list[str | os.PathLike],

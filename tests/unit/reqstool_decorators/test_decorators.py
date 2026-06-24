@@ -1,59 +1,68 @@
 # Copyright © LFV
 
+import pytest
 from reqstool_python_decorators.decorators.decorators import Requirements, SVCs
 
-
-def test_requirements_sets_attribute():
-    @Requirements("REQ_001")
-    def func():
-        pass
-
-    assert func.requirements == ("REQ_001",)
+# NOTE: these tests apply Requirements/SVCs via direct call (`Requirements(...)(func)`)
+# rather than `@Requirements(...)` decorator syntax. Decorator syntax would make the
+# nested function/class defs below show up as real, AST-discoverable annotations when
+# this repo self-applies its own processor (see scripts/generate_annotations.py) --
+# polluting the project's own requirement/SVC traceability data with these fake IDs.
 
 
-def test_requirements_multiple_ids():
-    @Requirements("A", "B")
-    def func():
-        pass
-
-    assert func.requirements == ("A", "B")
+def _function():
+    pass
 
 
-def test_requirements_preserves_function_name():
-    @Requirements("REQ_001")
-    def my_function():
-        pass
-
-    assert my_function.__name__ == "my_function"
+async def _async_function():
+    pass
 
 
-def test_svcs_sets_attribute():
-    @SVCs("SVC_001")
-    def func():
-        pass
-
-    assert func.svc_ids == ("SVC_001",)
+class _Class:
+    pass
 
 
-def test_svcs_multiple_ids():
-    @SVCs("A", "B")
-    def func():
-        pass
+@SVCs("SVC_DECORATORS_001")
+@pytest.mark.parametrize(
+    "decorator_factory,attr_name,target",
+    [
+        (Requirements, "requirements", _function),
+        (Requirements, "requirements", _async_function),
+        (Requirements, "requirements", _Class),
+        (SVCs, "svc_ids", _function),
+        (SVCs, "svc_ids", _async_function),
+        (SVCs, "svc_ids", _Class),
+    ],
+    ids=[
+        "requirements-on-function",
+        "requirements-on-async-function",
+        "requirements-on-class",
+        "svcs-on-function",
+        "svcs-on-async-function",
+        "svcs-on-class",
+    ],
+)
+def test_sets_attribute_on_target(decorator_factory, attr_name, target):
+    decorated = decorator_factory("REQ_001")(target)
 
-    assert func.svc_ids == ("A", "B")
+    assert getattr(decorated, attr_name) == ("REQ_001",)
 
 
-def test_svcs_preserves_function_name():
-    @SVCs("SVC_001")
-    def my_function():
-        pass
+@SVCs("SVC_DECORATORS_001")
+@pytest.mark.parametrize(
+    "decorator_factory,attr_name",
+    [(Requirements, "requirements"), (SVCs, "svc_ids")],
+    ids=["requirements", "svcs"],
+)
+def test_multiple_ids(decorator_factory, attr_name):
+    target = decorator_factory("A", "B")(_function)
 
-    assert my_function.__name__ == "my_function"
+    assert getattr(target, attr_name) == ("A", "B")
 
 
-def test_requirements_on_class():
-    @Requirements("REQ_001")
-    class MyClass:
-        pass
+@SVCs("SVC_DECORATORS_001")
+@pytest.mark.parametrize("decorator_factory", [Requirements, SVCs], ids=["requirements", "svcs"])
+def test_preserves_function_name(decorator_factory):
+    target = decorator_factory("REQ_001")(_function)
 
-    assert MyClass.requirements == ("REQ_001",)
+    assert target.__name__ == "_function"

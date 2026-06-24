@@ -1,0 +1,45 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/reqstool/reqstool-client/main/src/reqstool/resources/schemas/v1/requirements.schema.json
+---
+metadata:
+  urn: reqstool-python-decorators
+  variant: microservice
+  title: Reqstool Python Decorators
+  url: https://github.com/reqstool/reqstool-python-decorators
+
+requirements:
+  - id: DECORATORS_001
+    title: Decorator definitions
+    significance: shall
+    description: >-
+      The library shall provide Requirements and SVCs decorator factories that attach a
+      tuple of string IDs (requirements or svc_ids respectively) to the decorated function,
+      async function, or class as an attribute, without altering the decorated callable's
+      identity or name.
+    categories:
+      - functional-suitability
+    revision: "0.1.0"
+
+  - id: DECORATORS_002
+    title: Decorator processing
+    significance: shall
+    description: >-
+      The processor shall discover Python source files under a given set of directories,
+      parse each file's AST to find functions, async functions, and classes decorated with
+      Requirements or SVCs, and group the collected IDs into an implementations/tests
+      structure keyed by requirement or SVC ID, with each entry recording the fully
+      qualified name and a normalized element kind (FUNCTION/ASYNCFUNCTION mapped to
+      METHOD).
+    categories:
+      - functional-suitability
+    revision: "0.1.0"
+
+  - id: DECORATORS_003
+    title: YAML export
+    significance: shall
+    description: >-
+      The processor shall serialize the processed implementations/tests structure to a
+      YAML file at the given output path, prefixed with a JSON schema header comment,
+      creating any missing parent directories first.
+    categories:
+      - functional-suitability
+    revision: "0.1.0"
