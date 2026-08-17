@@ -14,7 +14,8 @@ jobs:
         with:
           python-version: "3.13"
       - name: Install pip package(s)
-        run: pip install hatch
+        # renovate: datasource=pypi depName=hatch
+        run: pip install hatch==1.18.0
       - name: Run black formatter check
         run: hatch run dev:black --check --verbose src tests
       - name: Run flake8 linter
