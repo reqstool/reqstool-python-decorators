@@ -68,7 +68,7 @@ jobs:
         # cleaning build/, move the pytest output dir outside of it.
         run: hatch run dev:python scripts/generate_annotations.py
       - name: Install reqstool
-        uses: reqstool/.github/.github/actions/install-reqstool@47ea2f814efd0a4dd02bce2d9fd9d97725945cf6 # 1.2.0
+        uses: reqstool/.github/.github/actions/install-reqstool@6fc8d3e3d4c3fdf7a83cb7b7a274e4761486ca71 # 1.2.1
         with:
           reqstool-source: ${{ matrix.reqstool-source }}
       - name: Validate reqstool spec completeness
@@ -76,11 +76,11 @@ jobs:
         # replacement for) the `reqstool status --fail-if-incomplete` gate below, which
         # is the actual required check on the pypi leg
         if: matrix.reqstool-source == 'main'
-        uses: reqstool/.github/.github/actions/validate-reqstool@47ea2f814efd0a4dd02bce2d9fd9d97725945cf6 # 1.2.0
+        uses: reqstool/.github/.github/actions/validate-reqstool@6fc8d3e3d4c3fdf7a83cb7b7a274e4761486ca71 # 1.2.1
       - name: Run reqstool status
         # Required gate on both matrix legs -- fails the build unless every
         # requirement is implemented and verified.
-        uses: reqstool/.github/.github/actions/reqstool-status@47ea2f814efd0a4dd02bce2d9fd9d97725945cf6 # 1.2.0
+        uses: reqstool/.github/.github/actions/reqstool-status@6fc8d3e3d4c3fdf7a83cb7b7a274e4761486ca71 # 1.2.1
         with:
           fail-if-incomplete: "true"
       # Upload artifacts for later use
@@ -92,4 +92,4 @@ jobs:
           path: dist/
 
   validate-openspec:
-    uses: reqstool/.github/.github/workflows/common-validate-openspec.yml@47ea2f814efd0a4dd02bce2d9fd9d97725945cf6 # 1.2.0
+    uses: reqstool/.github/.github/workflows/common-validate-openspec.yml@6fc8d3e3d4c3fdf7a83cb7b7a274e4761486ca71 # 1.2.1
