@@ -12,4 +12,5 @@ reqstool requirement and SVC IDs only; titles and descriptions are injected at r
 The system SHALL implement DECORATORS_003.
 
 #### Scenario: SVC_DECORATORS_003
-The system SHALL pass SVC_DECORATORS_003.
+- **WHEN** SVC_DECORATORS_003 is run
+- **THEN** it passes
