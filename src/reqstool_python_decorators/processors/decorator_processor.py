@@ -2,6 +2,7 @@
 
 from enum import Enum, unique
 import os
+from pathlib import Path
 from typing import ReadOnly, TypedDict
 from ruamel.yaml import YAML
 import ast
@@ -115,8 +116,9 @@ class DecoratorProcessor:
             - `name` (str): The name of the function or class.
             - `decorators` (list): List of dictionaries with decorator info including name and arguments e.g. "REQ_001".
         """
-        with open(file_path, "r") as file:
-            tree = ast.parse(file.read(), filename=str(file_path))
+        # Hand ast.parse the raw bytes so it decodes per PEP 263 (UTF-8 unless the file declares otherwise),
+        # instead of the platform locale encoding (cp1252 on Windows), which rejects valid UTF-8 sources.
+        tree = ast.parse(Path(file_path).read_bytes(), filename=str(file_path))
 
         for node in ast.walk(tree):
             if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)):
@@ -157,7 +159,7 @@ class DecoratorProcessor:
         instance.write_to_yaml("output_file.yml", data)
         ```
         """
-        with open(output_file, "w") as yaml_file:
+        with open(output_file, "w", encoding="utf-8") as yaml_file:
             yaml = YAML()
             yaml.default_flow_style = False
             yaml_file.write(self.yaml_language_server)
