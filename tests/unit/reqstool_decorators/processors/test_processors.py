@@ -1,3 +1,7 @@
+import os
+import subprocess
+import sys
+
 import pytest
 from reqstool_python_decorators.decorators.decorators import SVCs
 from reqstool_python_decorators.processors.decorator_processor import DecoratorProcessor
@@ -325,3 +329,63 @@ def test_process_decorated_data_no_state_accumulation(process_decorator_instance
     # Should have exactly 1 entry, not 2 due to state accumulation
     entries = data["requirement_annotations"]["implementations"]["REQ_001"]
     assert len(entries) == 1
+
+
+# ---------------------------------------------------------------------------
+# non-ASCII sources / platform locale encoding
+# ---------------------------------------------------------------------------
+
+# "Đ" is C4 90 in UTF-8; 0x90 is undefined in cp1252, so a locale-decoded read fails on Windows,
+# and any non-ASCII byte fails under an ASCII locale on Linux and macOS.
+_NON_ASCII_SOURCE = '# Đ non-ASCII comment\n@Requirements("REQ_001")\ndef my_func():\n    """Đ"""\n'
+
+_RUN_PROCESSOR = (
+    "import sys\n"
+    "from reqstool_python_decorators.processors.decorator_processor import DecoratorProcessor\n"
+    "DecoratorProcessor().process_decorated_data([sys.argv[1]], output_file=sys.argv[2])\n"
+)
+
+
+@SVCs("SVC_DECORATORS_002", "SVC_DECORATORS_003")
+def test_process_decorated_data_non_ascii_source_with_non_utf8_locale(tmp_path):
+    src_dir = tmp_path / "src"
+    src_dir.mkdir()
+    (src_dir / "mod.py").write_bytes(_NON_ASCII_SOURCE.encode("utf-8"))
+    output_file = tmp_path / "out" / "annotations.yml"
+
+    # Run in a child process with UTF-8 mode off and a legacy locale to mimic a default Windows setup.
+    env = {
+        **os.environ,
+        "PYTHONUTF8": "0",
+        "PYTHONCOERCECLOCALE": "0",
+        "PYTHONIOENCODING": "utf-8",
+        "LC_ALL": "C",
+        "LANG": "C",
+    }
+    result = subprocess.run(
+        [sys.executable, "-c", _RUN_PROCESSOR, str(src_dir), str(output_file)],
+        capture_output=True,
+        text=True,
+        env=env,
+    )
+
+    assert result.returncode == 0, result.stderr
+    data = YAML().load(output_file.read_text(encoding="utf-8"))
+    assert [
+        e["fullyQualifiedName"].rsplit(".", 1)[-1]
+        for e in data["requirement_annotations"]["implementations"]["REQ_001"]
+    ] == ["my_func"]
+
+
+@SVCs("SVC_DECORATORS_002")
+def test_get_functions_and_classes_honours_pep263_encoding_declaration(
+    process_decorator_instance: DecoratorProcessor, tmp_path
+):
+    src_file = tmp_path / "latin1_mod.py"
+    src_file.write_bytes(
+        '# -*- coding: latin-1 -*-\n# é\n@Requirements("REQ_001")\ndef my_func():\n    pass\n'.encode("latin-1")
+    )
+
+    process_decorator_instance.get_functions_and_classes(src_file, ["Requirements"])
+
+    assert [r["name"] for r in process_decorator_instance.req_svc_results] == ["my_func"]
