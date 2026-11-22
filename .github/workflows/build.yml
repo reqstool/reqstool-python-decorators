@@ -47,14 +47,12 @@ jobs:
     needs: build
     uses: reqstool/.github/.github/workflows/common-reqstool-verify.yml@ci/385-shared-python-build # SPIKE: pin to release SHA
     with:
-      ref: ${{ inputs.ref }}
       build-artifact: ${{ inputs.artifact-name || 'dist' }}-build
 
   smoke:
     needs: build
     uses: reqstool/.github/.github/workflows/python-smoke.yml@ci/385-shared-python-build # SPIKE: pin to release SHA
     with:
-      ref: ${{ inputs.ref }}
       dist-artifact: ${{ inputs.artifact-name || 'dist' }}
       # The unit tests on Windows/macOS: the #109 class of bug (platform default
       # encoding) only shows with fixture files holding bytes undefined in cp1252,
