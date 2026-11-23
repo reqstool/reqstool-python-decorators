@@ -56,7 +56,7 @@ jobs:
       command: pytest tests/unit tests/e2e
 
   validate-openspec:
-    uses: reqstool/.github/.github/workflows/common-validate-openspec.ymlX
+    uses: reqstool/.github/.github/workflows/common-validate-openspec.yml@91cd368066d5458b5d46bdf34c4d8ca483f6633f # 1.2.2
 
   ci:
     if: ${{ always() }}
