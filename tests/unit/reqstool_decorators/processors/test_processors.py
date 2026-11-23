@@ -1,6 +1,7 @@
 import os
 import subprocess
 import sys
+from pathlib import PureWindowsPath
 
 import pytest
 from reqstool_python_decorators.decorators.decorators import SVCs
@@ -389,3 +390,26 @@ def test_get_functions_and_classes_honours_pep263_encoding_declaration(
     process_decorator_instance.get_functions_and_classes(src_file, ["Requirements"])
 
     assert [r["name"] for r in process_decorator_instance.req_svc_results] == ["my_func"]
+
+
+# ---------------------------------------------------------------------------
+# Windows-style paths in fullyQualifiedName
+# ---------------------------------------------------------------------------
+
+
+@SVCs("SVC_DECORATORS_002")
+def test_fully_qualified_name_uses_dots_for_windows_path_separators(
+    process_decorator_instance: DecoratorProcessor, tmp_path, monkeypatch
+):
+    # os.walk/os.path.join yield "src\\pkg\\mod.py" on Windows; backslashes used to survive into the name.
+    package = tmp_path / "src" / "pkg"
+    package.mkdir(parents=True)
+    (package / "mod.py").write_text('@Requirements("REQ_001")\ndef my_func():\n    pass\n', encoding="utf-8")
+    monkeypatch.chdir(tmp_path)
+
+    process_decorator_instance.get_functions_and_classes(PureWindowsPath("src\\pkg\\mod.py"), ["Requirements"])
+    formatted = process_decorator_instance.format_results(process_decorator_instance.req_svc_results)
+
+    assert formatted["requirement_annotations"]["implementations"]["REQ_001"] == [
+        {"elementKind": "METHOD", "fullyQualifiedName": "src.pkg.mod.my_func"}
+    ]
