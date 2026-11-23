@@ -2,7 +2,7 @@
 
 from enum import Enum, unique
 import os
-from pathlib import Path
+from pathlib import Path, PurePath
 from typing import ReadOnly, TypedDict
 from ruamel.yaml import YAML
 import ast
@@ -132,7 +132,7 @@ class DecoratorProcessor:
                 if any(decorator_info["name"] in decorator_names for decorator_info in decorators_info):
                     self.req_svc_results.append(
                         {
-                            "fullyQualifiedName": str(file_path).replace("/", "."),
+                            "fullyQualifiedName": PurePath(file_path).as_posix().replace("/", "."),
                             "elementKind": node.__class__.__name__.removesuffix("Def").upper(),
                             "name": node.name,
                             "decorators": decorators_info,
