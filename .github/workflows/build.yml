@@ -30,11 +30,11 @@ permissions:
 
 jobs:
   lint:
-    uses: reqstool/.github/.github/workflows/python-lint.yml@91cd368066d5458b5d46bdf34c4d8ca483f6633f # 1.2.2
+    uses: reqstool/.github/.github/workflows/python-lint.yml@6340edb1ebc6c9cbeb3f533738ba8f9672a4d313 # 1.2.3
 
   build:
     needs: lint
-    uses: reqstool/.github/.github/workflows/python-build-hatch.yml@91cd368066d5458b5d46bdf34c4d8ca483f6633f # 1.2.2
+    uses: reqstool/.github/.github/workflows/python-build-hatch.yml@6340edb1ebc6c9cbeb3f533738ba8f9672a4d313 # 1.2.3
     with:
       coverage-source: reqstool_python_decorators
       ref: ${{ inputs.ref }}
@@ -43,20 +43,20 @@ jobs:
 
   reqstool:
     needs: build
-    uses: reqstool/.github/.github/workflows/common-reqstool-verify.yml@91cd368066d5458b5d46bdf34c4d8ca483f6633f # 1.2.2
+    uses: reqstool/.github/.github/workflows/common-reqstool-verify.yml@6340edb1ebc6c9cbeb3f533738ba8f9672a4d313 # 1.2.3
     with:
       build-artifact: ${{ inputs.artifact-name || 'dist' }}-build
 
   smoke:
     needs: build
-    uses: reqstool/.github/.github/workflows/python-smoke.yml@91cd368066d5458b5d46bdf34c4d8ca483f6633f # 1.2.2
+    uses: reqstool/.github/.github/workflows/python-smoke.yml@6340edb1ebc6c9cbeb3f533738ba8f9672a4d313 # 1.2.3
     with:
       dist-artifact: ${{ inputs.artifact-name || 'dist' }}
       requirements: pytest==8.4.1
       command: pytest tests/unit tests/e2e
 
   validate-openspec:
-    uses: reqstool/.github/.github/workflows/common-validate-openspec.yml@91cd368066d5458b5d46bdf34c4d8ca483f6633f # 1.2.2
+    uses: reqstool/.github/.github/workflows/common-validate-openspec.yml@6340edb1ebc6c9cbeb3f533738ba8f9672a4d313 # 1.2.3
 
   ci:
     if: ${{ always() }}
